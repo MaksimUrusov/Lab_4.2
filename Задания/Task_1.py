@@ -1,95 +1,54 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
-"""
-Во всех заданиях обязательно должны присутствовать:
-- метод инициализации __init__ , метод должен контролировать значения аргументов на корректность;
-- ввод с клавиатуры read;
-- вывод на экран display .
-18. Линейное уравнение . Поле first — дробное число, коэффициент ; поле
-second — дробное число, коэффициент . Реализовать метод вычисления корня
-линейного уравнения. Метод должен проверять неравенство коэффициента нулю.
-Решить задачу максимально задействовав перегрузки операторов.
-"""
-
-
+"""Выполнить индивидуальное задание 1 лабораторной работы 4.1, максимально задействовав
+имеющиеся в Python средства перегрузки операторов."""
 class Pair:
-    """
-    Класс, хранящий введенные коэффициенты A и B в полях first и second
-    """
+    def __init__(self, first=0, second=0):
+        self.set_values(first, second)
 
-    def __init__(self, first, second):
-        """
-        Конструктор класса, принимает два параметра, валидирует их и сохраняет в поля
-        """
-        # Проверка, является ли first(A) дробным числом
-        if not isinstance(first, float):
-            raise TypeError("Значение first должно быть дробным числом")
-
-        # Проверка, является ли second(B) дробным числом
-        if not isinstance(second, float):
-            raise TypeError("Значение second должно быть дробным числом")
-
-        # Проверка, не равен ли second(A) нулю
-        if first == 0:
-            raise ValueError("Параметр A не должен быть равен нулю")
-
-        # Записываем значения в поля
+    def set_values(self, first, second):
+        if not isinstance(first, int) or not isinstance(second, int) or second < 0:
+            raise ValueError("Некорректные значения: first должно быть целым числом, second - положительным целым числом.")
         self.first = first
         self.second = second
 
-    def sol_lin_equ(self):
-        """
-        Вычисляется значение линейного уравнения, с использованием переданных в конструктор параметров
-        """
-        return (self.second * -1.0) / self.first
+    def read(self):
+        first = int(input("Введите целую часть числа: "))
+        second = int(input("Введите дробную часть числа (как положительное целое число): "))
+        self.set_values(first, second)
 
     def display(self):
-        """
-        Метод выводит на консоль линейное уравнение вида Ax+B с подставленными параметрами
-        """
-        print(f"(y = {self.first}x + {self.second})")
+        print(f"Число: {self.first}.{str(self.second).zfill(2)}")
 
-    @classmethod
-    def read(cls):
-        """
-        Статичный метод для создания экземпляра класса
-        """
-        a = float(input("Введите коэффициент A: "))
-        b = float(input("Введите коэффициент B: "))
+    def multiply(self, multiplier):
+        if not isinstance(multiplier, int):
+            raise ValueError("Множитель должен быть целым числом.")
+        # Преобразование в число с плавающей точкой для умножения
+        full_number = float(f"{self.first}.{str(self.second).zfill(2)}")
+        result = full_number * multiplier
+        self.first, self.second = map(int, str(result).split('.'))
 
-        return cls(a, b)
+    # Перегрузка оператора умножения
+    def __mul__(self, other):
+        self.multiply(other)
+        return self
 
-    def __eq__(self, other):
-        return self.sol_lin_equ() == other.sol_lin_equ()
+def make_pair(first, second):
+    try:
+        return Pair(first, second)
+    except ValueError as e:
+        print(e)
+        return None
 
-    def __ne__(self, other):
-        return self.sol_lin_equ() != other.sol_lin_equ()
+if __name__ == '__main__':
+    pair = make_pair(12, 34)
+    if pair is not None:
+        pair.display()
 
-    def __add__(self, other):
-        self.sol_lin_equ() + other.sol_lin_equ()
+        pair.read()
+        pair.display()
 
-    def __sub__(self, other):
-        return self.sol_lin_equ() - other.sol_lin_equ()
-
-    def __truediv__(self, other):
-        return self.sol_lin_equ() / other.sol_lin_equ()
-
-
-if __name__ == "__main__":
-    pair = Pair.read()
-    pair2 = Pair(5.2, 10.4)
-    pair.display()
-    pair2.display()
-    print(pair.sol_lin_equ())
-    print(pair2.sol_lin_equ())
-    # Перегрузка оператора ==
-    print(pair == pair2)
-    # Перегрузка оператора !=
-    print(pair != pair2)
-    # Перегрузка оператора +
-    print(pair + pair2)
-    # Перегрузка оператора -
-    print(pair - pair2)
-    # Перегрузка оператора
-    print(pair / pair2)
+        multiplier = int(input("Введите множитель: "))
+        pair * multiplier  # Используем перегруженный оператор умножения
+        print("После умножения:")
+        pair.display()
